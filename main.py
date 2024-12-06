@@ -2,16 +2,15 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-from utils import User
 from auth import (
     Token,
     authenticate_user,
     ACCESS_TOKEN_EXPIRE_MINUTES,
-    create_access_token,
-    get_current_active_user
+    create_access_token
 )
 from testing import activate_all_testing
-from guns import router as guns_router
+from routes.guns import router as guns_router
+from routes.users import router as users_router
 
 testing = True
 if testing:
@@ -21,6 +20,7 @@ if testing:
 app = FastAPI()
 
 app.include_router(guns_router, prefix="/guns", tags=["guns"])
+app.include_router(users_router, prefix="/users", tags=["users"])
 
 
 @app.post("/token")
@@ -39,17 +39,3 @@ async def login_for_access_token(
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
-
-
-@app.get("/users/me/", response_model=User)
-async def read_users_me(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
-    return current_user
-
-
-@app.get("/users/me/items/")
-async def read_own_items(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-):
-    return [{"item_id": "Foo", "owner": current_user.username}]
