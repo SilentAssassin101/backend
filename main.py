@@ -3,7 +3,6 @@ from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
 from utils import (
-    initialize_tables,
     getGunsFromUser,
     User
 )
@@ -15,24 +14,14 @@ from auth import (
     oauth2_scheme,
     get_current_active_user
 )
+from testing import activate_all_testing
 
-
-initialize_tables()  # TODO: Auto test data
+testing = True
+if testing:
+    activate_all_testing
 
 
 app = FastAPI()
-
-
-# def generateTestUser():
-#     firstName = "john"
-#     lastName = "doe"
-#     email = "johndoe@gmail.com"
-#     password = "secret"
-#     hashed_password = get_password_hash(password=password)
-#     addUser(firstName=firstName, lastName=lastName, email=email, password=hashed_password)
-
-
-# generateTestUser()1
 
 
 @app.post("/token")
