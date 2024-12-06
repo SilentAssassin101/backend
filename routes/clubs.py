@@ -47,6 +47,10 @@ def db_delete_club(club_id: int):  # TODO: remove all members after
         """DELETE FROM clubs WHERE id=?""",
         params=(club_id)
     )
+    execute_query(
+        """DELETE FROM clubMembers WHERE clubId=?""",
+        params=(club_id)
+    )
 
 
 def get_club_owner(club_id: int):
@@ -142,7 +146,7 @@ async def leave_club(
     token: Annotated[str, Depends(oauth2_scheme)]
 ):
     user_id = get_current_user(token).id
-    if user_id in db_check_club_members(club_id=club_id):
-        db_remove_club_member(club_id=club_id, member_id=user_id)
+    if user_id in db_check_club_members(club_id) and user_id not in get_club_owner(club_id):
+        db_remove_club_member(club_id, member_id=user_id)
     else:
         raise not_found_exception
