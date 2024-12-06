@@ -1,10 +1,6 @@
 import sqlite3
 
 
-def fake_hash_password(password: str):
-    return "fakehashed" + password
-
-
 def execute_query(query, params=(), fetch=False):
     with sqlite3.connect("testing.db") as conn:
         cursor = conn.cursor()
@@ -15,13 +11,15 @@ def execute_query(query, params=(), fetch=False):
 
 
 def initialize_tables():
+    print("Initializing Tables")
     execute_query(
         """CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
             firstName TEXT NOT NULL,
             lastName TEXT NOT NULL,
             email TEXT UNIQUE,
-            password TEXT
+            password TEXT,
+            disabled int
         )
         """)
     execute_query(
@@ -33,15 +31,6 @@ def initialize_tables():
             type TEXT NOT NULL
         )
         """)
-
-
-def generateTestUser():
-    firstName = "john"
-    lastName = "doe"
-    email = "johndoe@gmail.com"
-    password = "secret"
-    hashed_password = fake_hash_password(password=password)
-    addUser(firstName=firstName, lastName=lastName, email=email, password=hashed_password)
 
 
 def addUser(firstName: str, lastName: str, email: str, password: str):
@@ -57,7 +46,6 @@ def addUser(firstName: str, lastName: str, email: str, password: str):
 
 
 def getUserFromEmail(email: str):
-    print("1", email)
     return execute_query(
         """SELECT * FROM users WHERE email=? LIMIT 1""",
         params=(email,),

@@ -1,2 +1,3 @@
 testing.db
 .flake8
+.env
