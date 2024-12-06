@@ -1,4 +1,4 @@
-from utils import initialize_tables, execute_query, addUser
+from utils import execute_query, addUser
 from auth import get_password_hash
 import os
 from dotenv import load_dotenv
@@ -7,6 +7,28 @@ load_dotenv()
 
 TEST_PASSWORD = os.getenv("TEST_PASSWORD")
 
+def initialize_tables():
+    print("Initializing Tables")
+    execute_query(
+        """CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY,
+            firstName TEXT NOT NULL,
+            lastName TEXT NOT NULL,
+            email TEXT UNIQUE,
+            password TEXT,
+            disabled int DEFAULT 0
+        )
+        """)
+    execute_query(
+        """CREATE TABLE IF NOT EXISTS guns (
+            id INTEGER PRIMARY KEY,
+            ownerId INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            manufacturer TEXT NOT NULL,
+            type TEXT NOT NULL,
+            joules REAL NOT NULL
+        )
+        """)
 
 def activate_all_testing():
     initialize_tables()

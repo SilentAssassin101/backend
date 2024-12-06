@@ -31,28 +31,7 @@ def execute_query(query, params=(), fetch=False):
         conn.commit()
 
 
-def initialize_tables():
-    print("Initializing Tables")
-    execute_query(
-        """CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY,
-            firstName TEXT NOT NULL,
-            lastName TEXT NOT NULL,
-            email TEXT UNIQUE,
-            password TEXT,
-            disabled int DEFAULT 0
-        )
-        """)
-    execute_query(
-        """CREATE TABLE IF NOT EXISTS guns (
-            id INTEGER PRIMARY KEY,
-            ownerId INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            manufacturer TEXT NOT NULL,
-            type TEXT NOT NULL,
-            joules REAL NOT NULL
-        )
-        """)
+
 
 
 def addUser(firstName: str, lastName: str, email: str, password: str):
