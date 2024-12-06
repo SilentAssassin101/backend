@@ -1,13 +1,17 @@
 import sqlite3
 
 
+def fake_hash_password(password: str):
+    return "fakehashed" + password
+
+
 def execute_query(query, params=(), fetch=False):
     with sqlite3.connect("testing.db") as conn:
         cursor = conn.cursor()
         cursor.execute(query, params)
         if fetch:
             return cursor.fetchall()
-        conn.commit
+        conn.commit()
 
 
 def initialize_tables():
@@ -16,7 +20,8 @@ def initialize_tables():
             id INTEGER PRIMARY KEY,
             firstName TEXT NOT NULL,
             lastName TEXT NOT NULL,
-            email TEXT UNIQUE
+            email TEXT UNIQUE,
+            password TEXT
         )
         """)
     execute_query(
@@ -30,21 +35,32 @@ def initialize_tables():
         """)
 
 
-def addUser(firstName: str, lastName: str, email: str):
+def generateTestUser():
+    firstName = "john"
+    lastName = "doe"
+    email = "johndoe@gmail.com"
+    password = "secret"
+    hashed_password = fake_hash_password(password=password)
+    addUser(firstName=firstName, lastName=lastName, email=email, password=hashed_password)
+
+
+def addUser(firstName: str, lastName: str, email: str, password: str):
     execute_query(
         """INSERT INTO users (
         firstName,
         lastName,
-        email
-        ) VALUES (?,?,?)""",
-        params=(firstName, lastName, email)
+        email,
+        password
+        ) VALUES (?,?,?,?)""",
+        params=(firstName, lastName, email, password)
     )
 
 
 def getUserFromEmail(email: str):
-    execute_query(
+    print("1", email)
+    return execute_query(
         """SELECT * FROM users WHERE email=? LIMIT 1""",
-        params=(email),
+        params=(email,),
         fetch=True
     )
 
@@ -76,7 +92,7 @@ def removeGun(gunId: int):
 
 
 def getGunsFromUser(id: int):
-    execute_query(
+    return execute_query(
         """SELECT * FROM guns WHERE ownerId=?""",
         params=(id),
         fetch=True
