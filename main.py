@@ -1,9 +1,9 @@
 from typing import Union
 from fastapi import FastAPI
 from pydantic import BaseModel
-from utils import initialize_table
+from utils import initialize_tables
 
-initialize_table()
+initialize_tables()
 
 app = FastAPI()
 
