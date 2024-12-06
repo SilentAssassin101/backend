@@ -4,15 +4,16 @@ from typing import Annotated
 from auth import oauth2_scheme, get_current_user
 
 
-def add_gun(ownerId: int, name: str, manufacturer: str, type: str):
+def add_gun(ownerId: int, name: str, manufacturer: str, type: str, joules: float):
     execute_query(
         """INSERT INTO guns (
         ownerId,
         name,
         manufacturer,
-        type
-        ) VALUES (?,?,?,?)""",
-        params=(ownerId, name, manufacturer, type)
+        type,
+        joules
+        ) VALUES (?,?,?,?,?)""",
+        params=(ownerId, name, manufacturer, type, joules)
     )
 
 
@@ -56,9 +57,9 @@ def get_my_guns(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 @router.post("/add")  # TODO: image uploads
-async def add_my_gun(name: str, manufacturer: str, type: str, token: Annotated[str, Depends(oauth2_scheme)]):
+async def add_my_gun(name: str, manufacturer: str, type: str, joules: float, token: Annotated[str, Depends(oauth2_scheme)]):
     user_id = get_current_user().id
-    add_gun(ownerId=user_id, name=name, manufacturer=manufacturer, type=type)
+    add_gun(ownerId=user_id, name=name, manufacturer=manufacturer, type=type, joules=joules)
 
 
 @router.post("/remove/{gun_id}")

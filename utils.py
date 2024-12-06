@@ -49,7 +49,8 @@ def initialize_tables():
             ownerId INTEGER NOT NULL,
             name TEXT NOT NULL,
             manufacturer TEXT NOT NULL,
-            type TEXT NOT NULL
+            type TEXT NOT NULL,
+            joules REAL NOT NULL
         )
         """)
 
