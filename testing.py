@@ -18,7 +18,7 @@ def generate_test_user():
 
 
 def generate_test_user_master():
-    if execute_query(
+    if not execute_query(
         """SELECT * FROM users""",
         fetch=True
     ):

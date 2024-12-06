@@ -18,7 +18,7 @@ from testing import activate_all_testing
 
 testing = True
 if testing:
-    activate_all_testing
+    activate_all_testing()
 
 
 app = FastAPI()

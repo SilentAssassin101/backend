@@ -40,7 +40,7 @@ def initialize_tables():
             lastName TEXT NOT NULL,
             email TEXT UNIQUE,
             password TEXT,
-            disabled int
+            disabled int DEFAULT 0
         )
         """)
     execute_query(
@@ -60,9 +60,10 @@ def addUser(firstName: str, lastName: str, email: str, password: str):
         firstName,
         lastName,
         email,
-        password
-        ) VALUES (?,?,?,?)""",
-        params=(firstName, lastName, email, password)
+        password,
+        disabled
+        ) VALUES (?,?,?,?,?)""",
+        params=(firstName, lastName, email, password, False)
     )
 
 
