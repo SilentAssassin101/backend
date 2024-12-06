@@ -58,27 +58,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     return {"access_token": user.username, "token_type": "bearer"}
 
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
-
-
-@app.get("/items/")
-async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
-    return {"token": token}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-
-@app.put("/items/{item_id}")
-def update_item(item_id: int, item: Item):
-    return {"item_name": item.name, "item_id": item_id}
-
-
 @app.get("/api/{user_id}/guns")
-def get_user_guns(user_id: int):
+def get_user_guns(user_id: int, token: Annotated[str, Depends(oauth2_scheme)]):
     guns = getGunsFromUser(user_id)
     return {"user_id": user_id, "user_guns": guns}
