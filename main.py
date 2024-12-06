@@ -11,6 +11,7 @@ from auth import (
 from testing import activate_all_testing
 from routes.guns import router as guns_router
 from routes.users import router as users_router
+from routes.clubs import router as clubs_router
 
 testing = True
 if testing:
@@ -21,6 +22,7 @@ app = FastAPI()
 
 app.include_router(guns_router, prefix="/guns", tags=["guns"])
 app.include_router(users_router, prefix="/users", tags=["users"])
+app.include_router(clubs_router, prefix="/clubs", tags=["clubs"])
 
 
 @app.post("/token")

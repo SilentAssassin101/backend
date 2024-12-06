@@ -3,8 +3,8 @@ from typing import Annotated
 from utils import execute_query
 from auth import oauth2_scheme, get_current_user
 
-already_exists_exception = HTTPException(
-    status_code=status.HTTP_403_ALREADY_EXISTS,
+conflict_exception = HTTPException(
+    status_code=status.HTTP_409_CONFLICT,
     detail="Data Already Exists",
     headers={"WWW-Authenticate": "Bearer"},
 )
@@ -93,9 +93,33 @@ def db_check_club_exists(club_id: int):
 
 def db_remove_club_member(club_id: int, member_id: int):
     execute_query(
-        """DELETE FROM clubMembers WHERE club_id=? AND member_id=?""",
+        """DELETE FROM clubMembers WHERE clubIdd=? AND memberId=?""",
         params=(club_id, member_id)
     )
+
+
+def db_check_invite(club_id: int, user_id: int):
+    return execute_query(
+        """SELECT * FROM clubInvites WHERE clubId=? AND userId=? LIMIT 1""",
+        params=(club_id, user_id),
+        fetch=True
+    )
+
+
+def db_send_invite(club_id: int, user_id: int):
+    if not db_check_invite(club_id, user_id):
+        execute_query(
+            """INSERT INTO clubInvites (clubId, userId) VALUES (?,?)""",
+            params=(club_id, user_id)
+        )
+
+
+def db_remove_invite(club_id: int, user_id: int):
+    if db_check_invite(club_id, user_id):
+        execute_query(
+            """DELETE FROM clubInvites WHERE clubId=? AND userId=?""",
+            params=(club_id, user_id)
+        )
 
 
 router = APIRouter()
@@ -111,7 +135,7 @@ async def create_club(
     if not db_check_club_name(club_name=name):
         db_create_club(owner_id=user_id, name=name, address=address)
     else:
-        raise already_exists_exception
+        raise conflict_exception
 
 
 @router.post("/delete")
@@ -132,12 +156,13 @@ async def join_club(
     club_id: int,
     token: Annotated[str, Depends(oauth2_scheme)]
 ):
-    # TODO: check for invite
     user_id = get_current_user(token).id
+    if not db_check_invite(club_id, user_id):
+        raise credentials_exception
     if user_id not in db_check_club_members(club_id=club_id):
         db_add_club_member(club_id=club_id, member_id=user_id)
     else:
-        raise already_exists_exception
+        raise conflict_exception
 
 
 @router.post("/leave/{club_id}")
@@ -150,3 +175,15 @@ async def leave_club(
         db_remove_club_member(club_id, member_id=user_id)
     else:
         raise not_found_exception
+
+
+@router.post("/invite")
+async def invite_club(
+    club_id: int,
+    invitee_id: int,
+    token: Annotated[str, Depends(oauth2_scheme)]
+):
+    user_id = get_current_user(token).id
+    if user_id not in get_club_owner(club_id):
+        raise credentials_exception
+    db_send_invite(club_id, user_id=invitee_id)
