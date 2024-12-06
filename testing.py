@@ -37,6 +37,11 @@ def initialize_tables():
             name TEXT NOT NULL,
             address TEXT NOT NULL)"""
     )
+    execute_query(
+        """CREATE TABLE IF NOT EXISTS clubMembers (
+            clubId INTEGER NOT NULL,
+            memberId INTEGER NOT NULL)"""
+    )
 
 
 def activate_all_testing():

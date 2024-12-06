@@ -31,9 +31,6 @@ def execute_query(query, params=(), fetch=False):
         conn.commit()
 
 
-
-
-
 def addUser(firstName: str, lastName: str, email: str, password: str):
     execute_query(
         """INSERT INTO users (

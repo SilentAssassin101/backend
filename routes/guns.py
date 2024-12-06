@@ -64,13 +64,13 @@ async def add_my_gun(
     joules: float,
     token: Annotated[str, Depends(oauth2_scheme)]
 ):
-    user_id = get_current_user().id
+    user_id = get_current_user(token).id
     add_gun(ownerId=user_id, name=name, manufacturer=manufacturer, type=type, joules=joules)
 
 
 @router.post("/remove/{gun_id}")
 async def remove_my_gun(gun_id: int, token: Annotated[str, Depends(oauth2_scheme)]):
-    user_id = get_current_user().id
+    user_id = get_current_user(token).id
     if not get_gun_owner(gun_id) == user_id:
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
