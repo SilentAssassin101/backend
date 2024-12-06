@@ -1,4 +1,25 @@
 import sqlite3
+from fastapi import HTTPException
+from pydantic import BaseModel
+from typing import Union
+
+
+class Item(BaseModel):
+    name: str
+    price: float
+    is_offer: Union[bool, None] = None
+
+
+class User(BaseModel):
+    id: int
+    firstName: str
+    lastName: str
+    username: str  # email
+
+
+class UserInDB(User):
+    hashed_password: str
+    disabled: bool
 
 
 def execute_query(query, params=(), fetch=False):
@@ -85,3 +106,30 @@ def getGunsFromUser(id: int):
         params=(id),
         fetch=True
     )
+
+
+def get_user_dict_from_email(email: str):
+    user_list = getUserFromEmail(email)
+    if not user_list:
+        raise HTTPException(
+            status_code=400, detail="Incorrect username or password")
+    user = UserInDB(**map_user_list(user_list))
+    return user
+
+
+def map_user_list(user_list: list):
+    # The SQLite database query returns a tuple containing a list
+    # We want that list to be a dictionary
+    if user_list[0][5] == 0:
+        disabled = False
+    else:
+        disabled = True
+    user_list_mapped = {
+        'id': user_list[0][0],
+        'firstName': user_list[0][1],
+        'lastName': user_list[0][2],
+        'username': user_list[0][3],
+        'hashed_password': user_list[0][4],
+        'disabled': disabled
+    }
+    return user_list_mapped
