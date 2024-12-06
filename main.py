@@ -2,19 +2,16 @@ from typing import Annotated
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from datetime import timedelta
-from utils import (
-    getGunsFromUser,
-    User
-)
+from utils import User
 from auth import (
     Token,
     authenticate_user,
     ACCESS_TOKEN_EXPIRE_MINUTES,
     create_access_token,
-    oauth2_scheme,
     get_current_active_user
 )
 from testing import activate_all_testing
+from guns import router as guns_router
 
 testing = True
 if testing:
@@ -22,6 +19,8 @@ if testing:
 
 
 app = FastAPI()
+
+app.include_router(guns_router, prefix="/guns", tags=["guns"])
 
 
 @app.post("/token")
@@ -42,20 +41,14 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 
-@app.get("/api/{user_id}/guns")
-def get_user_guns(user_id: int, token: Annotated[str, Depends(oauth2_scheme)]):
-    guns = getGunsFromUser(user_id)
-    return {"user_id": user_id, "user_guns": guns}
-
-
-@app.get("/api/users/me/", response_model=User)
+@app.get("/users/me/", response_model=User)
 async def read_users_me(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):
     return current_user
 
 
-@app.get("/api/users/me/items/")
+@app.get("/users/me/items/")
 async def read_own_items(
     current_user: Annotated[User, Depends(get_current_active_user)],
 ):

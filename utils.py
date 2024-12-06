@@ -82,33 +82,6 @@ def removeUser(id: int):
     )
 
 
-def addGun(ownerId: int, name: str, manufacturer: str, type: str):
-    execute_query(
-        """INSERT INTO guns (
-        ownerId,
-        name,
-        manufacturer,
-        type
-        ) VALUES (?,?,?,?)""",
-        params=(ownerId, name, manufacturer, type)
-    )
-
-
-def removeGun(gunId: int):
-    execute_query(
-        """DELETE FROM guns WHERE id=? LIMIT 1""",
-        params=(gunId)
-    )
-
-
-def getGunsFromUser(id: int):
-    return execute_query(
-        """SELECT * FROM guns WHERE ownerId=?""",
-        params=(id),
-        fetch=True
-    )
-
-
 def get_user_dict_from_email(email: str):
     user_list = getUserFromEmail(email)
     if not user_list:
