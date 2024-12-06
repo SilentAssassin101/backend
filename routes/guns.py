@@ -1,7 +1,7 @@
 from utils import execute_query
 from fastapi import APIRouter, Depends
 from typing import Annotated
-from auth import oauth2_scheme
+from auth import oauth2_scheme, get_current_user
 
 
 def add_gun(ownerId: int, name: str, manufacturer: str, type: str):
@@ -34,7 +34,14 @@ def get_guns_from_user(id: int):
 router = APIRouter()
 
 
-@router.get("/api/{user_id}/guns")
+@router.get("/{user_id}")
 def get_user_guns(user_id: int, token: Annotated[str, Depends(oauth2_scheme)]):
+    guns = get_guns_from_user(user_id)
+    return {"user_id": user_id, "user_guns": guns}
+
+
+@router.get("/me")
+def get_my_guns(token: Annotated[str, Depends(oauth2_scheme)]):
+    user_id = get_current_user().id
     guns = get_guns_from_user(user_id)
     return {"user_id": user_id, "user_guns": guns}
