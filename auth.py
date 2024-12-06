@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import BaseModel
-from utils import get_user_dict_from_email, User
+from utils import UserInDB, get_user_dict_from_email, User
 import os
 from dotenv import load_dotenv
 from passlib.context import CryptContext
@@ -14,7 +14,7 @@ from jwt.exceptions import InvalidTokenError
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")  # TODO: Move this logic to its own file
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 load_dotenv()
 
@@ -61,7 +61,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> UserInDB:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",

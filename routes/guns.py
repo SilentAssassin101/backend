@@ -45,3 +45,9 @@ def get_my_guns(token: Annotated[str, Depends(oauth2_scheme)]):
     user_id = get_current_user().id
     guns = get_guns_from_user(user_id)
     return {"user_id": user_id, "user_guns": guns}
+
+
+@router.post("/add")  # TODO: image uploads
+async def add_my_gun(name: str, manufacturer: str, type: str, token: Annotated[str, Depends(oauth2_scheme)]):
+    user_id = get_current_user().id
+    add_gun(ownerId=user_id, name=name, manufacturer=manufacturer, type=type)
