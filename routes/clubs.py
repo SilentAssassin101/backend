@@ -42,7 +42,7 @@ def db_check_club_name(club_name: str):
     )
 
 
-def db_delete_club(club_id: int):
+def db_delete_club(club_id: int):  # TODO: remove all members after
     execute_query(
         """DELETE FROM clubs WHERE id=?""",
         params=(club_id)
@@ -87,6 +87,13 @@ def db_check_club_exists(club_id: int):
         return True
 
 
+def db_remove_club_member(club_id: int, member_id: int):
+    execute_query(
+        """DELETE FROM clubMembers WHERE club_id=? AND member_id=?""",
+        params=(club_id, member_id)
+    )
+
+
 router = APIRouter()
 
 
@@ -127,3 +134,15 @@ async def join_club(
         db_add_club_member(club_id=club_id, member_id=user_id)
     else:
         raise already_exists_exception
+
+
+@router.post("/leave/{club_id}")
+async def leave_club(
+    club_id: int,
+    token: Annotated[str, Depends(oauth2_scheme)]
+):
+    user_id = get_current_user(token).id
+    if user_id in db_check_club_members(club_id=club_id):
+        db_remove_club_member(club_id=club_id, member_id=user_id)
+    else:
+        raise not_found_exception
