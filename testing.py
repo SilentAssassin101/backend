@@ -7,6 +7,7 @@ load_dotenv()
 
 TEST_PASSWORD = os.getenv("TEST_PASSWORD")
 
+
 def initialize_tables():
     print("Initializing Tables")
     execute_query(
@@ -29,6 +30,14 @@ def initialize_tables():
             joules REAL NOT NULL
         )
         """)
+    execute_query(
+        """CREATE TABLE IF NOT EXISTS clubs (
+            id INTEGER PRIMARY KEY,
+            ownerId INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            address TEXT NOT NULL)"""
+    )
+
 
 def activate_all_testing():
     initialize_tables()
