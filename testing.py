@@ -3,7 +3,6 @@ from auth import get_password_hash
 
 
 def activate_all_testing():
-    print("work in progress")
     initialize_tables()
     generate_test_user_master()
 
